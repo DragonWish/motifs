@@ -9,4 +9,4 @@ https://stepic.org/Bioinformatics-Algorithms-2/
 
 
 
-Usage: FIND_MOTIF.py inputfile.txt outputfile.txt
+Usage: FIND_MOTIF.py inputfile.txt outputfile.txt k
