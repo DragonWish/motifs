@@ -11,7 +11,8 @@ import operator
 import random
 
 options = OptionParser(usage='%prog input output ', description="Specify input file"\
-                       "containing the motif matrix. Specify output file for the boxplot to be "\
+                       "containing the motif matrix. Specify text file containing "\
+                       "a list of proteomes to be examined. Specify output file for the boxplot to be "\
                        "saved as")
 
 
@@ -73,10 +74,6 @@ def read_sequences(filename):
             titles[title]+=i.replace("X","A")[:-1]
     return titles
 
-##print top 25 sequences in the sorted dictionary
-##for i in sorted_scores[:25]:
-##    prob_motif=most_probable(i[0],k,hpt_profile)[0]
-##    print str(i[1])+"\t"+prob_motif+"\t"+str(titles.keys()[titles.values().index(i[0])])
 
 def histogram(scores,high,low): #histogram of scores
     fig,ax=plt.subplots()
@@ -99,7 +96,7 @@ def boxplot(scores, titles, outfile):    #boxplot of logged scores, whiskers at 
     #plt.show()
     pl.savefig(outfile)
     #print the number of outliers
-    print str(len(r["fliers"][0].get_data()[1]))+" outliers"
+    #print str(len(r["fliers"][0].get_data()[1]))+" outliers"
 
 
 def get_scores(proteome,prof,k):
@@ -112,21 +109,21 @@ def get_scores(proteome,prof,k):
         kmer,prob=most_probable(i,k,prof)
         scores[i]=prob
 
-    #sorted_scores=sorted(scores.iteritems(),key=operator.itemgetter(1), reverse=True)
-
+    print proteome +" done"
     print str(time.time()-x1)+"  elapsed"
     return scores, titles
 
 def main():
     opts, args = options.parse_args()
     
-    #require 2 arguments
-    if len(args) < 2:
+    #require 3 arguments
+    if len(args) < 3:
         options.print_help()
         return
     
     motif_file=args[0]
-    image_file=args[1]
+    proteomes=args[1]
+    image_file=args[2]
     
     f=open(motif_file)
     prof=f.read()
@@ -135,18 +132,24 @@ def main():
 
     k=len(profile['A'])
     
-    organism_proteome="1773.fasta"
+    f2=open(proteomes)
+    organisms=f2.readlines()
+    f2.close()
 
-    scores, titles = get_scores(organism_proteome,profile,k)
-    #t=read_sequences(organism_proteome)
-    #first20=[probability(i[1:21],hpt_profile) for i in t.values()]
-    #first20_e=[probability(i[1:21],hpt_profile_e) for i in t.values()]
+    org_names=[i[:-7] for i in organisms]
+    org_scores=[]
     
+    for i in organisms:
+        scores,titles=get_scores(i[:-1],profile,k)
+        org_scores.append(scores.values())
+
+#below is an algorithm to display the top 25 ranking proteins within a given proteome
+
 ##    sorted_scores=sorted(scores.iteritems(),key=operator.itemgetter(1), reverse=True)
 ##    for i in sorted_scores[:25]:
 ##        print str(i[1])+"\t"+str(most_probable(i[0],k,hpt_profile)[0])+"\t"+str(titles.keys()[titles.values().index(i[0])])
-##    boxplot(scores)
-    boxplot([scores.values()],["org"],image_file)
+
+    boxplot(org_scores,org_names,image_file)
 
 
 if __name__=="__main__":
