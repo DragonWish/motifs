@@ -271,7 +271,7 @@ def main():
     
     #write motif profile matrix in motif_file
     f2=open(motif_file,'w')
-    f2.write(str(profile(best_gibbs,k)))
+    f2.write(str(profile(best_gibbs)))
     f2.close()
     
     print time.time()-x1, "s elapsed"
