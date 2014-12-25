@@ -1,0 +1,2 @@
+athaliana.fasta
+spombe.fasta
