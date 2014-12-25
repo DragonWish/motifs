@@ -9,7 +9,7 @@ import time
 #of the peptide sequences provided. 
 #Default is Gibbs
 
-options = OptionParser(usage='%prog input output ', description="Specify a protein sequence file and an output filename \n"\
+options = OptionParser(usage='%prog input outputfile k motif_file ', description="Specify a protein sequence file and an output filename \n"\
                 "usage: FIND_MOTIF.py inputfile outputfile k motif_file \n"\
                 "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
                 "and generate a motif profile that is saved as a python dictionary in the designated"\
