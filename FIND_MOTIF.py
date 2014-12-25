@@ -5,14 +5,34 @@ import random
 import time
 
 #Motif finding
-#Program takes .txt file of unaligned sequences as input, finds a representative motif
+#Program takes .txt or .fasta file of unaligned sequences as input, finds a representative motif
 #of the peptide sequences provided. 
 #Default is Gibbs
 
-options = OptionParser(usage='%prog input output ', description="Specify a protein sequence file and an output filename \n usage: FIND_MOTIF.py inputfile.txt outputfile.txt")
+options = OptionParser(usage='%prog input output ', description="Specify a protein sequence file and an output filename \n"\
+                "usage: FIND_MOTIF.py inputfile outputfile k motif_file \n"\
+                "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
+                "and generate a motif profile that is saved as a python dictionary in the designated"\
+                "motif_file. k is the specified length of the motif, and outputfile contains "\
+                "the most likely motif selections from each sequence in inputfile. ")
 
+#opens and reads a fasta file (filename), returns dictionary mapping each
+#title (>...) to its corresponding protein sequence.
+def read_sequences(filename):
+    f=open(filename)
+    lines=f.readlines()
+    f.close()
+    titles={}
+    for i in lines:
+        if i[0]==">":
+            title=i[:-1]
+            titles[title]=""
+        else:
+            titles[title]+=i.replace("X","A")[:-1]
+    return titles
 
-def transpose(m):           #Transpose a matrix
+#Transpose a matrix
+def transpose(m): 
     for j in m:
         if len(j)!=10: print j, len(j)
     mT=[['' for j in m] for x in m[0]]
@@ -22,7 +42,9 @@ def transpose(m):           #Transpose a matrix
             
     return mT
 
-def profile(motifs): #with pseudocounts
+#Generate a profile matrix (dimensions 20xk) given a collection of sequences 
+#that are k-mers. The profile is generated with pseudocounts.
+def profile(motifs): 
     m_=[[j for j in i] for i in motifs]
     m=transpose(m_)
     l=len(m)
@@ -205,12 +227,17 @@ def main_randomized():
             best_motif=motif
     return best_motif, best_score
 
-def main_gibbs(seqfile):
-    f=open(seqfile)
-    lines=f.readlines()
-    f.close()
-    proteins=[i[:-1] for i in lines]
-    k=10
+def main_gibbs(seqfile,k):
+    #for fasta formatted sequences:
+    if seqfile[-5:]=="fasta":
+        fasta_seqs=read_sequences(seqfile)
+        proteins=fasta_seqs.values()
+    #for text formatted files:
+    elif seqfile[-3:]=="txt":
+        f=open(seqfile)
+        lines=f.readlines()
+        f.close()
+        proteins=[i[:-1] for i in lines]
     t=len(proteins)
     best_motif=[]
     best_score=40000
@@ -222,20 +249,31 @@ def main_gibbs(seqfile):
             best_motif=motif
     return best_motif
 
+
 x1=time.time()
 
 def main():
     opts, args = options.parse_args()
-    if len(args) < 2:
+    #require 4 arguments
+    if len(args) < 4:
         options.print_help()
         return
     seqfile=args[0]
     outfile=args[1]
+    k=int(args[2])
+    motif_file=args[3]
     
-    best_gibbs=main_gibbs(seqfile)
+    #write motif kmers in outfile
+    best_gibbs=main_gibbs(seqfile,k)
     f=open(outfile,'w')
     for i in best_gibbs:f.write(i+"\n")
     f.close()
+    
+    #write motif profile matrix in motif_file
+    f2=open(motif_file,'w')
+    f2.write(str(profile(best_gibbs,k)))
+    f2.close()
+    
     print time.time()-x1, "s elapsed"
 
 if __name__ == '__main__':
