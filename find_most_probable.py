@@ -10,7 +10,7 @@ import time
 import operator
 import random
 
-options = OptionParser(usage='%prog input output ', description="Specify input file"\
+options = OptionParser(usage='%prog input_motif list_proteomes output ', description="Specify input file"\
                        "containing the motif matrix. Specify text file containing "\
                        "a list of proteomes to be examined. Specify output file for the boxplot to be "\
                        "saved as")
