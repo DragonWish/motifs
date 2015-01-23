@@ -33,8 +33,6 @@ def read_sequences(filename):
 
 #Transpose a matrix
 def transpose(m): 
-    for j in m:
-        if len(j)!=10: print j, len(j)
     mT=[['' for j in m] for x in m[0]]
     for i in range(0,len(m[0])):
         for j in range(0,len(m)):
