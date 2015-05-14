@@ -110,7 +110,7 @@ def get_scores(proteome,prof,k):
         scores[i]=prob
 
     print proteome +" done"
-    print str(time.time()-x1)+"  elapsed"
+    print str(time.time()-x1)+" s elapsed"
     return scores, titles
 
 def main():
