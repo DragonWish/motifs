@@ -147,7 +147,7 @@ def main():
 
 ##    sorted_scores=sorted(scores.iteritems(),key=operator.itemgetter(1), reverse=True)
 ##    for i in sorted_scores[:25]:
-##        print str(i[1])+"\t"+str(most_probable(i[0],k,hpt_profile)[0])+"\t"+str(titles.keys()[titles.values().index(i[0])])
+##        print str(i[1])+"\t"+str(most_probable(i[0],k,profile)[0])+"\t"+str(titles.keys()[titles.values().index(i[0])])
 
     boxplot(org_scores,org_names,image_file)
 
