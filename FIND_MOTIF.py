@@ -4,6 +4,8 @@ from optparse import OptionParser
 import random
 import time
 
+random.seed(2)
+
 #Motif finding
 #Program takes .txt or .fasta file of unaligned sequences as input, finds a representative motif
 #of the peptide sequences provided. 
