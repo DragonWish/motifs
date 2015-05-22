@@ -10,6 +10,8 @@ import time
 import operator
 import random
 
+random.seed(2)
+
 options = OptionParser(usage='%prog input_motif list_proteomes output ', description="Specify input file"\
                        "containing the motif matrix. Specify text file containing "\
                        "a list of proteomes to be examined. Specify output file for the boxplot to be "\
@@ -131,6 +133,16 @@ def main():
     profile=ast.literal_eval(prof)
 
     k=len(profile['A'])
+    
+    #Add ambiguous amino acids:
+    #B: Asx (N+D)
+    profile['B']=[profile['N'][i]+profile['D'][i] for i in range(k)]
+    #Z: Glx (Q+E)
+    profile['Z']=[profile['Q'][i]+profile['E'][i] for i in range(k)]
+    #J: Xle (I+L)
+    profile['J']=[profile['I'][i]+profile['L'][i] for i in range(k)]
+    #X: any (1)
+    profile['X']=[1 for i in range(k)]
     
     f2=open(proteomes)
     organisms=f2.readlines()
