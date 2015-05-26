@@ -16,7 +16,13 @@ options = OptionParser(usage='%prog input outputfile k motif_file ', description
                 "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
                 "and generate a motif profile that is saved as a python dictionary in the designated"\
                 "motif_file. k is the specified length of the motif, and outputfile contains "\
-                "the most likely motif selections from each sequence in inputfile. ")
+                "the most likely motif selections from each sequence in inputfile. \n")
+                "OPTIONAL: use '-c [cutoff value]' to set the family classification threshold. "\
+                "If this option isn't used, the 3IQR threshold will be applied. ")
+
+options.add_option("-c","--cutoff",dest="cutoff_ptile",
+                   help="define the % cutoff on the phi scores of PFAM sequences to "\
+                   "be used as a family classification threshold")
 
 #opens and reads a fasta file (filename), returns dictionary mapping each
 #title (>...) to its corresponding protein sequence.
@@ -248,7 +254,14 @@ def main_gibbs(seqfile,k):
             best_score=score
             best_motif=motif
     return best_motif
-
+    
+def find_percentile(seqs,cutoff):
+    n=len(seqs)
+    cutoff_index=int(n*cutoff)
+    prof=profile(seqs)
+    phis=[probability(i,prof) for i in seqs]
+    cutoff_phi=sorted(phis)[cutoff_index]
+    return prof, cutoff_phi
 
 x1=time.time()
 
@@ -263,15 +276,27 @@ def main():
     k=int(args[2])
     motif_file=args[3]
     
+    #cutoff option
+    if opts.cutoff_ptile==None:
+        cutoff=-1
+    else:
+        cutoff=float(opts.cutoff_ptile)/100.
+    
     #write motif kmers in outfile
     best_gibbs=main_gibbs(seqfile,k)
     f=open(outfile,'w')
     for i in best_gibbs:f.write(i+"\n")
     f.close()
     
-    #write motif profile matrix in motif_file
+    #write cutoff and motif profile matrix in motif_file
     f2=open(motif_file,'w')
-    f2.write(str(profile(best_gibbs)))
+    if cutoff<0:
+        f2.write("IQR\n")
+        profile_final=profile(best_gibbs)
+    else:
+        profile_final,cutoff_value=find_percentile(best_gibbs,cutoff)
+        f2.write(str(cutoff_value)+"\n")
+    f2.write(str(profile_final))
     f2.close()
     
     print time.time()-x1, "s elapsed"
