@@ -12,10 +12,10 @@ import random
 
 random.seed(2)
 
-options = OptionParser(usage='%prog input_motif list_proteomes output ', description="Specify input file"\
+options = OptionParser(usage='%prog [input_motif] [list_proteomes] [output_file] ', description="Specify input file"\
                        "containing the motif matrix. Specify text file containing "\
-                       "a list of proteomes to be examined. Specify output file for the boxplot to be "\
-                       "saved as")
+                       "a list of proteomes to be examined. Specify output file for the outliers to be "\
+                       "saved in")
 
 
 def transpose(m):
@@ -115,6 +115,23 @@ def get_scores(proteome,prof,k):
     print str(time.time()-x1)+" s elapsed"
     return scores, titles
 
+#get the index of scores where threshold c is reached    
+def get_outliers_cutoff(scores,c):
+    nn=0
+    for i in scores:
+        if math.log(i[1],10)>=c:nn+=1
+        else:break
+    return nn
+
+#get the score value at the 3IQR upper whisker
+def get_3iqr_cutoff(sortedscores):
+    justscores=[math.log(i[1],10) for i in sortedscores]
+    scores_q1=len(justscores)/4
+    scores_q3=scores_q1*3
+    iqr=justscores[scores_q1]-justscores[scores_q3]
+    scores_whisker=justscores[scores_q1]+3*iqr
+    return scores_whisker
+    
 def main():
     opts, args = options.parse_args()
     
@@ -125,12 +142,17 @@ def main():
     
     motif_file=args[0]
     proteomes=args[1]
-    image_file=args[2]
+    outliers_file=args[2]
     
     f=open(motif_file)
-    prof=f.read()
+    prof=f.readlines()
     f.close()
-    profile=ast.literal_eval(prof)
+    use_iqr=True
+    if prof[0][:3]!="IQR":
+        use_iqr=False
+        cutoff_value=float(prof[0])
+        log_cutoff=math.log(cutoff_value,10)
+    profile=ast.literal_eval(prof[1])
 
     k=len(profile['A'])
     
@@ -151,17 +173,31 @@ def main():
     org_names=[i[:-7] for i in organisms]
     org_scores=[]
     
+    f3=open(outliers_file,'w')
     for i in organisms:
+        f3.write(i)
         scores,titles=get_scores(i[:-1],profile,k)
         org_scores.append(scores.values())
-
+        
+        sorted_scores=sorted(scores.iteritems(),key=operator.itemgetter(1), reverse=True)
+        
+        if use_iqr==True:
+            log_cutoff=get_3iqr_cutoff(sorted_scores)
+            
+        outlier_index=get_outliers_cutoff(sorted_scores,log_cutoff)
+        for i in sorted_scores[:outlier_index]:
+            f3.write(str(i[1])+"\t"
+                     +str(most_probable(i[0],k,profile)[0])+"\t"
+                     +str(titles.keys()[titles.values().index(i[0])])+"\n")
+        
+    f3.close()
 #below is an algorithm to display the top 25 ranking proteins within a given proteome
 
 ##    sorted_scores=sorted(scores.iteritems(),key=operator.itemgetter(1), reverse=True)
 ##    for i in sorted_scores[:25]:
 ##        print str(i[1])+"\t"+str(most_probable(i[0],k,profile)[0])+"\t"+str(titles.keys()[titles.values().index(i[0])])
 
-    boxplot(org_scores,org_names,image_file)
+    #boxplot(org_scores,org_names,image_file)
 
 
 if __name__=="__main__":
