@@ -125,7 +125,7 @@ def get_outliers_cutoff(scores,c):
 
 #get the score value at the 3IQR upper whisker
 def get_3iqr_cutoff(sortedscores):
-    justscores=[math.log(i[1],10) for i in sortedscores]
+    justscores=[math.log(i[1],10) for i in sortedscores if i[1]>0]
     scores_q1=len(justscores)/4
     scores_q3=scores_q1*3
     iqr=justscores[scores_q1]-justscores[scores_q3]
@@ -191,11 +191,6 @@ def main():
                      +str(titles.keys()[titles.values().index(i[0])])+"\n")
         
     f3.close()
-#below is an algorithm to display the top 25 ranking proteins within a given proteome
-
-##    sorted_scores=sorted(scores.iteritems(),key=operator.itemgetter(1), reverse=True)
-##    for i in sorted_scores[:25]:
-##        print str(i[1])+"\t"+str(most_probable(i[0],k,profile)[0])+"\t"+str(titles.keys()[titles.values().index(i[0])])
 
     #boxplot(org_scores,org_names,image_file)
 
