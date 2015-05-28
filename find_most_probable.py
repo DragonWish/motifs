@@ -105,10 +105,11 @@ def get_scores(proteome,prof,k):
     x1=time.time()
     titles=read_sequences(proteome)
     proteins=titles.values()
+    ptitles=titles.keys()
     maxp=0
     scores={}
-    for i in proteins:
-        kmer,prob=most_probable(i,k,prof)
+    for i in ptitles:
+        kmer,prob=most_probable(titles[i],k,prof)
         scores[i]=prob
 
     print proteome +" done"
@@ -187,8 +188,8 @@ def main():
         outlier_index=get_outliers_cutoff(sorted_scores,log_cutoff)
         for i in sorted_scores[:outlier_index]:
             f3.write(str(i[1])+"\t"
-                     +str(most_probable(i[0],k,profile)[0])+"\t"
-                     +str(titles.keys()[titles.values().index(i[0])])+"\n")
+                     +str(most_probable(titles[i[0]],k,profile)[0])+"\t"
+                     +str(i[0])+"\n")
         
     f3.close()
 
