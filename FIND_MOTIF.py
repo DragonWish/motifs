@@ -16,7 +16,7 @@ options = OptionParser(usage='%prog input outputfile k motif_file ', description
                 "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
                 "and generate a motif profile that is saved as a python dictionary in the designated"\
                 "motif_file. k is the specified length of the motif, and outputfile contains "\
-                "the most likely motif selections from each sequence in inputfile. \n")
+                "the most likely motif selections from each sequence in inputfile. \n"\
                 "OPTIONAL: use '-c [cutoff value]' to set the family classification threshold. "\
                 "If this option isn't used, the 3IQR threshold will be applied. ")
 
