@@ -94,6 +94,7 @@ def boxplot(scores, titles, cutoff):    #boxplot of logged scores, whiskers at 3
                 logged_data[i].append(math.log(j,10))
     r=plt.boxplot(logged_data, whis=3)
     plt.axhline(y=math.log(cutoff,10))
+    plt.ylabel("Log likelihood score")
     pl.xticks(range(1,len(scores)+1),titles)
     plt.show()
 
