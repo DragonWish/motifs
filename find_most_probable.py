@@ -86,19 +86,16 @@ def histogram(scores,high,low): #histogram of scores
     pl.gca().set_xscale("log")
     pl.show()
 
-def boxplot(scores, titles, outfile):    #boxplot of logged scores, whiskers at 3IQR
+def boxplot(scores, titles, cutoff):    #boxplot of logged scores, whiskers at 3IQR
     logged_data=[[] for i in scores]
     for i in range(0,len(scores)):
         for j in scores[i]:
             if j>0:
                 logged_data[i].append(math.log(j,10))
     r=plt.boxplot(logged_data, whis=3)
-
+    plt.axhline(y=math.log(cutoff,10))
     pl.xticks(range(1,len(scores)+1),titles)
-    #plt.show()
-    pl.savefig(outfile)
-    #print the number of outliers
-    #print str(len(r["fliers"][0].get_data()[1]))+" outliers"
+    plt.show()
 
 
 def get_scores(proteome,prof,k):
