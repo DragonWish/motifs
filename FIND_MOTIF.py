@@ -11,18 +11,26 @@ random.seed(2)
 #of the peptide sequences provided. 
 #Default is Gibbs
 
-options = OptionParser(usage='%prog input outputfile k motif_file ', description="Specify a protein sequence file and an output filename \n"\
-                "usage: FIND_MOTIF.py inputfile outputfile k motif_file \n"\
-                "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
-                "and generate a motif profile that is saved as a python dictionary in the designated "\
-                "motif_file. k is the specified length of the motif, and outputfile contains "\
-                "the most likely motif selections from each sequence in inputfile. \n"\
-                "OPTIONAL: use '-c [cutoff value]' to set the family classification threshold. "\
-                "If this option isn't used, the 3IQR threshold will be applied. ")
+options = OptionParser(usage='%prog input outputfile k motif_file ',
+                       description="Specify a protein sequence file and an output filename \n"\
+                       "usage: FIND_MOTIF.py inputfile outputfile k motif_file \n"\
+                       "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
+                       "and generate a motif profile that is saved as a python dictionary in the designated"\
+                       "motif_file. k is the specified length of the motif, and outputfile contains "\
+                       "the most likely motif selections from each sequence in inputfile. \n"\
+                       "Use -h for additional options. \n")
 
 options.add_option("-c","--cutoff",dest="cutoff_ptile",
                    help="define the % cutoff on the phi scores of PFAM sequences to "\
-                   "be used as a family classification threshold")
+                   "be used as a family classification threshold. "\
+                   "If this option isn't used, the 3IQR threshold will be applied.\n")
+options.add_option("-G","--global",dest="global_cycles",
+                   help="define the total number of global cycles to be performed. "\
+                   "At least 20 (default) cycles is recommended to geerate replicable motifs.\n")
+options.add_option("-N","--gibbs",dest="gibbs_iter",
+                   help="define the total number of iterations within one run of the Gibbs search. "\
+                   "At least 2000 (default) cycles is recommended for datasets with "\
+                   "several hundred sequences.\n")
 
 #opens and reads a fasta file (filename), returns dictionary mapping each
 #title (>...) to its corresponding protein sequence.
@@ -281,7 +289,17 @@ def main():
         cutoff=-1
     else:
         cutoff=float(opts.cutoff_ptile)/100.
-    
+    #global cycle option
+    if opts.global_cycles==None:
+        G=20
+    else:
+        G=int(opts.global_cycles)
+    #gibbs iterations option
+    if opts.gibbs_iter==None:
+        N=2000
+    else:
+        N=int(opts.gibbs_iter)
+        
     #write motif kmers in outfile
     best_gibbs=main_gibbs(seqfile,k)
     f=open(outfile,'w')
