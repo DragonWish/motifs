@@ -14,7 +14,7 @@ random.seed(2)
 options = OptionParser(usage='%prog input outputfile k motif_file ', description="Specify a protein sequence file and an output filename \n"\
                 "usage: FIND_MOTIF.py inputfile outputfile k motif_file \n"\
                 "This will take the unaligned sequences in inputfile (could be .txt or .fasta) "\
-                "and generate a motif profile that is saved as a python dictionary in the designated"\
+                "and generate a motif profile that is saved as a python dictionary in the designated "\
                 "motif_file. k is the specified length of the motif, and outputfile contains "\
                 "the most likely motif selections from each sequence in inputfile. \n"\
                 "OPTIONAL: use '-c [cutoff value]' to set the family classification threshold. "\
@@ -36,7 +36,7 @@ def read_sequences(filename):
             title=i[:-1]
             titles[title]=""
         else:
-            titles[title]+=i.replace("X","A")[:-1]
+            titles[title]+=(i.replace("X","A")[:-1]).upper()
     return titles
 
 #Transpose a matrix
