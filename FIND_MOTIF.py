@@ -44,7 +44,7 @@ def read_sequences(filename):
             title=i[:-1]
             titles[title]=""
         else:
-            titles[title]+=titles[title]+=(i.upper()).replace("X","A")[:-1]
+            titles[title]+=(i.upper()).replace("X","A")[:-1]
     return titles
 
 #Transpose a matrix
